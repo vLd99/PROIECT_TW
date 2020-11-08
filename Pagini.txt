@@ -1,0 +1,28 @@
+1. Pagina Login (GET)
+2. Pagina Register (din login) (POST)
+3. Pagina principala (dupa Login)
+Initial goala cu 3 butoane
+
+Butoane pentru 3 + fragmente:
+
+1.(buton)Browse All Projects (GET) -> Fragment: Lista Proiecte (buton) Proiect ->
+Fragment: Categories List (buton) Categorie -> Fragment: Bugs List
+(buton) Bug -> Fragment: View Bug
+
+2.(buton) Browse my projects (GET) -> Fragment: Lista Proiecte (buton) Proiect ->
+Fragment: Categories List (buton) Categorie -> Fragment: Bugs List
+(buton) Bug -> Fragment: View Bug
+
+3.(buton) Add a new project (GET) -> Fragment: Add Project (campuri:
+Name, Description, Git Link, Membrii)  (buton) Create (POST)
+
+*Structuram lista de proiecte ca un tabel, pe fiecare linie avem un proiect
+si in cadrul liniei un buton cu "Become Tester"
+
+Useri: Eryk
+Proiecte: Cristi Triscu
+Categorii: Cristi Pitu
+Bug-uri: Vlad
+Comentarii: Rares
+
+
