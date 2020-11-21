@@ -19,7 +19,7 @@
     "mysql2": "^2.2.5",
     "request": "^2.88.2",
     "require": "^2.4.20",
-    "sequelize": "^6.3.5"
-    
+    "sequelize": "^6.3.5",
+    "sequelizer": "^1.1.4"
   }
 }
