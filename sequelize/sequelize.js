@@ -8,7 +8,7 @@ const sequelize = new Sequelize('bd_proiect_tw', 'root', '', {
 const Proiect = sequelize.define("proiect", {
   id_proiect: {
     type: Sequelize.INTEGER(11),
-    autoIncrement:true,
+    autoIncrement: true,
     primaryKey: true
   },
   descriere: Sequelize.STRING(300),
@@ -22,14 +22,14 @@ const Proiect = sequelize.define("proiect", {
   })
 
 
-  sequelize.authenticate()
-    .then(() => {
-        console.log("sequelize has successfully connected to the database")
-    })
+sequelize.authenticate()
+  .then(() => {
+    console.log("sequelize has successfully connected to the database")
+  })
 
-    .catch(err => console.error("Unable to connect to the database:" + err));
+  .catch(err => console.error("Unable to connect to the database:" + err));
 
 
 sequelize.sync({ force: false, alter: false }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
 
-export {Proiect}
+export { Proiect }
