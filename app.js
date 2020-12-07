@@ -3,7 +3,7 @@ import { Proiect } from "./sequelize/sequelize.js"
 
 router.route("/projects").get((req, res) => {
 
-    Proiect.findAll().then((proiect) => {
+  Proiect.findAll().then((proiect) => {
     return res.json(proiect);
   });
 
@@ -11,7 +11,7 @@ router.route("/projects").get((req, res) => {
 
 router.route("/projects/:id_proiect").get((req, res) => {
 
-  console.log("se apelieaza")
+
   Proiect.findByPk(req.params.id_proiect).then((result) => res.json(result))
 }
 );

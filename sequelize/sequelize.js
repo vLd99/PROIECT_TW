@@ -1,11 +1,13 @@
 import Sequelize from "sequelize"
 
-const sequelize = new Sequelize('bd_proiect_tw', 'root', '', {
+export const sequelize = new Sequelize('bd_proiect_tw', 'root', '', {
   host: 'localhost',
   dialect: 'mysql'
 })
 
-const Proiect = sequelize.define("proiect", {
+
+
+const Proiect = sequelize.define("project", {
   id_proiect: {
     type: Sequelize.INTEGER(11),
     autoIncrement: true,
@@ -15,11 +17,14 @@ const Proiect = sequelize.define("proiect", {
   denumire: Sequelize.STRING(300)
 
 
+})
 
-},
-  {
-    timestamps: false
-  })
+export { Proiect }
+
+
+
+
+
 
 
 sequelize.authenticate()
@@ -31,5 +36,3 @@ sequelize.authenticate()
 
 
 sequelize.sync({ force: false, alter: false }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
-
-export { Proiect }
