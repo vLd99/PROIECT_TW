@@ -1,14 +1,12 @@
-<<<<<<< HEAD
+
 import Sequelize from "sequelize"
 
-export const sequelize = new Sequelize('bd_licenta', 'root', '', {
+export const sequelize = new Sequelize('bd_proiect_tw', 'root', '', {
   host: 'localhost',
   dialect: 'mysql'
 })
 
-
-
-const Proiect = sequelize.define("project", {
+export const Proiect = sequelize.define("project", {
   id_proiect: {
     type: Sequelize.INTEGER(11),
     autoIncrement: true,
@@ -20,8 +18,7 @@ const Proiect = sequelize.define("project", {
 
 })
 
-
-const Categorie = sequelize.define("category", {
+export const Categorie = sequelize.define("category", {
   id_categorie: {
     type: Sequelize.INTEGER(11),
     autoIncrement: true,
@@ -33,41 +30,7 @@ const Categorie = sequelize.define("category", {
 
 })
 
-export { Proiect ,Categorie}
 
-
-
-Proiect.hasMany(Categorie,{foreignKey:"id_proiect",foreignKeyConstraint:true});
-Categorie.belongsTo(Proiect,{foreignKey:"id_proiect"});
-
-
-
-
-
-sequelize.authenticate()
-  .then(() => {
-    console.log("sequelize has successfully connected to the database")
-  })
-
-  .catch(err => console.error("Unable to connect to the database:" + err));
-
-
-sequelize.sync({ force: true, alter: true }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
-=======
-import Sequelize from "sequelize"
-
-const sequelize = new Sequelize(
-  "proiect_tw", "vlad", "vladase18", {
-  host: "localhost",
-  dialect: "mssql",
-  dialectOptions: {
-    options: {
-      trustedConnections: true,
-      enableArithAbort: true
-    }
-  }
-}
-);
 
 export const Comments = sequelize.define("Comments", {
   id_comment: {
@@ -77,32 +40,66 @@ export const Comments = sequelize.define("Comments", {
   },
   body: Sequelize.STRING(300),
   nrlikes: Sequelize.INTEGER,
-  stare:Sequelize.STRING(300),
-  
+  stare: Sequelize.STRING(300),
+
 });
 
-export const Bugs = sequelize.define("Bugs", {
+export const Bugs = sequelize.define("Bug", {
   id_bug: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true
-  }
+  },
+  severitate: Sequelize.STRING(300),
+  prioritate: Sequelize.STRING(300),
+  descriere: Sequelize.STRING(300),
+  link_git: Sequelize.STRING(300)
 });
 
-export const Users = sequelize.define("Users", {
-  id_user: {
-    type: Sequelize.INTEGER,
+export const User = sequelize.define("user", {
+  id_user: 
+  {
+    type: Sequelize.INTEGER(11),
     autoIncrement: true,
     primaryKey: true
+  },
+  username: 
+  { 
+    type: Sequelize.STRING(300), 
+    allowNull: false,
+    unique: {
+      args: true,
+      msg: 'Username address already in use!'
+    }
+  },
+  mail: 
+  {
+    type: Sequelize.STRING(300),
+    allowNull: false,
+    unique: {
+      args: true,
+      msg: 'Email address already in use!'
+    }
+  },
+  parola:  
+  { 
+      type: Sequelize.STRING(300),
+      allowNull: false, 
   }
 
-});
+})
 
 Bugs.hasMany(Comments, { foreignKey: "id_bug", foreignKeyConstraint: true });
 Comments.belongsTo(Bugs, { foreignKey: "id_bug" });
 
-Users.hasMany(Comments, { foreignKey: "id_user", foreignKeyConstraint: true });
-Comments.belongsTo(Users, { foreignKey: "id_user" });
+User.hasMany(Comments, { foreignKey: "id_user", foreignKeyConstraint: true });
+Comments.belongsTo(User, { foreignKey: "id_user" });
+
+Categorie.hasMany(Bugs, { foreignKey: "id_categorie", foreignKeyConstraint: true });
+Bugs.belongsTo(Categorie, { foreignKey: "id_categorie" });
+
+User.hasMany(Bugs, { foreignKey: "id_user", foreignKeyConstraint: true });
+Bugs.belongsTo(User, { foreignKey: "id_user" });
 
 
 
@@ -115,5 +112,3 @@ sequelize.authenticate()
 
 
 sequelize.sync({ force: false, alter: false }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
-
->>>>>>> origin/dev-Rares
