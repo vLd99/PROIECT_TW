@@ -1,5 +1,5 @@
 import { app, router } from "./init/serverinit.js"
-import { Proiect } from "./sequelize/sequelize.js"
+import { Proiect, Categorie } from "./sequelize/sequelize.js"
 
 router.route("/projects").get((req, res) => {
 
@@ -48,6 +48,28 @@ router.route("/projects/:id_proiect").delete((req, res) =>
     }
   }).then((result) => res.json(result))
 );
+
+
+
+
+router.route("/sequelize/projectsWithCategories").post((req, res) => {
+  Proiect.create({
+
+    descriere: req.body.descriere,
+    denumire: req.body.denumire
+  }).then(proiect => {
+
+    req.body.Categorie.forEach(categorie => {
+      Categorie.create({
+        id_categorie: categorie.body.id_categorie,
+        denumire_categ: categorie.denumire_categ,
+        descriere_categ: categorie.descriere_categ,
+        id_proiect: proiect.id_proiect
+      }).then(response => res.json(response)).catch(err=>console.log(err))
+    })
+
+  }).catch(err=>console.log(err))
+})
 
 
 var port = 8001;
