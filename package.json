@@ -1,4 +1,5 @@
 {
+
   "name": "proiect_tw",
   "version": "1.0.0",
   "description": "",
@@ -6,10 +7,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "body-parser": "^1.19.0",
@@ -22,4 +25,5 @@
     "sequelize": "^6.3.5",
     "sequelizer": "^1.1.4"
   }
+
 }
