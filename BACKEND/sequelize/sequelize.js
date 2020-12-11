@@ -89,6 +89,19 @@ export const User = sequelize.define("user", {
 
 })
 
+export const Category = sequelize.define("category", {
+  id_categorie: {
+    type: Sequelize.INTEGER(11),
+    autoIncrement: true,
+    primaryKey: true
+  },
+  descriere_categ: Sequelize.STRING(300),
+  denumire_categ: Sequelize.STRING(300),
+  id_proiect: Sequelize.INTEGER(11)
+
+
+})
+
 Bugs.hasMany(Comments, { foreignKey: "id_bug", foreignKeyConstraint: true });
 Comments.belongsTo(Bugs, { foreignKey: "id_bug" });
 
@@ -111,4 +124,4 @@ sequelize.authenticate()
   .catch(err => console.error("Unable to connect to the database:" + err));
 
 
-sequelize.sync({ force: false, alter: false }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
+sequelize.sync({ force: false, alter: true }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);

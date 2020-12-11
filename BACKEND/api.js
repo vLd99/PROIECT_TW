@@ -1,5 +1,5 @@
 import { app, router } from "./init/serverinit.js"
-import { Proiect, Categorie, User, Bugs } from "./sequelize/sequelize.js"
+import { Proiect, Category, User, Bugs,Comments } from "./sequelize/sequelize.js"
 
 
 ////---------------PROJECTS-----------------////
@@ -59,7 +59,7 @@ router.route("/sequelize/projectsWithCategories").post((req, res) => {
     denumire: req.body.denumire
   }).then(proiect => {
 
-    req.body.Categorie.forEach(categorie => {
+    req.body.Category.forEach(categorie => {
       Categorie.create({
         id_categorie: categorie.body.id_categorie,
         denumire_categ: categorie.denumire_categ,
@@ -293,7 +293,56 @@ User.destroy({
 
 ////---------------USERS-----------------////
 
+////---------------CATEGORIES-----------------////
 
+router.route("/categories").get((req, res) => {
+
+  Category.findAll().then((Category) => {
+  return res.json(Category);
+});
+
+})
+
+router.route("/categories/:id_categorie").get((req, res) => {
+
+//console.log("se apelieaza")
+Category.findByPk(req.params.id_categorie).then((result) => res.json(result))
+}
+);
+
+router.route("/categories").post((req, res) =>
+Category.create({
+  id_categorie: req.body.id_categorie,
+  descriere_categ: req.body.descriere_categ,
+  denumire_categ: req.body.denumire_categ,
+  
+}).then((result) => res.json(result))
+);
+
+
+
+router.route("/categories/:id_categorie").put((req, res) =>
+Category.update({
+  id_categorie: req.body.id_categorie,
+  descriere_categ: req.body.descriere_categ,
+  denumire_categ: req.body.denumire_categ
+},
+  {
+    where: {
+      id_categorie: req.params.id_categorie
+    }
+
+
+  }).then((result) => res.json(result))
+);
+
+
+router.route("/categories/:id").delete((req, res) => {
+  Category.findByPk(req.params.id).then(record => {
+      record.destroy();
+  }).then(() => res.sendStatus(200));
+})
+////---------------CATEGORIES-----------------////
 
 
 var port = 8001;
