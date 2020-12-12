@@ -13,22 +13,12 @@ export const Proiect = sequelize.define("project", {
     primaryKey: true
   },
   descriere: Sequelize.STRING(300),
-  denumire: Sequelize.STRING(300)
-
-
-})
-
-export const Categorie = sequelize.define("category", {
-  id_categorie: {
-    type: Sequelize.INTEGER(11),
-    autoIncrement: true,
-    primaryKey: true
-  },
-  denumire_categ: Sequelize.STRING(300),
-  descriere_categ: Sequelize.STRING(300)
-
+  denumire: Sequelize.STRING(300),
+  id_categorie:Sequelize.INTEGER(11)
 
 })
+
+
 
 
 
@@ -41,7 +31,7 @@ export const Comments = sequelize.define("Comments", {
   body: Sequelize.STRING(300),
   nrlikes: Sequelize.INTEGER,
   stare: Sequelize.STRING(300),
-
+  id_bug:Sequelize.INTEGER(11)
 });
 
 export const Bugs = sequelize.define("Bug", {
@@ -53,7 +43,10 @@ export const Bugs = sequelize.define("Bug", {
   severitate: Sequelize.STRING(300),
   prioritate: Sequelize.STRING(300),
   descriere: Sequelize.STRING(300),
-  link_git: Sequelize.STRING(300)
+  link_git: Sequelize.STRING(300),
+  id_categorie:Sequelize.STRING(300),
+  id_user:Sequelize.INTEGER(11),
+  id_proiect:Sequelize.INTEGER(11)
 });
 
 export const User = sequelize.define("user", {
@@ -97,7 +90,7 @@ export const Category = sequelize.define("category", {
   },
   descriere_categ: Sequelize.STRING(300),
   denumire_categ: Sequelize.STRING(300),
-  id_proiect: Sequelize.INTEGER(11)
+
 
 
 })
@@ -105,15 +98,15 @@ export const Category = sequelize.define("category", {
 Bugs.hasMany(Comments, { foreignKey: "id_bug", foreignKeyConstraint: true });
 Comments.belongsTo(Bugs, { foreignKey: "id_bug" });
 
-User.hasMany(Comments, { foreignKey: "id_user", foreignKeyConstraint: true });
-Comments.belongsTo(User, { foreignKey: "id_user" });
 
-Categorie.hasMany(Bugs, { foreignKey: "id_categorie", foreignKeyConstraint: true });
-Bugs.belongsTo(Categorie, { foreignKey: "id_categorie" });
 
-User.hasMany(Bugs, { foreignKey: "id_user", foreignKeyConstraint: true });
-Bugs.belongsTo(User, { foreignKey: "id_user" });
+Proiect.hasMany(Bugs, { foreignKey: "id_proiect", foreignKeyConstraint: true });
+Bugs.belongsTo(Proiect, { foreignKey: "id_proiect" });
 
+
+
+Category.hasMany(Proiect, { foreignKey: "id_categorie", foreignKeyConstraint: true });
+Proiect.belongsTo(Category, { foreignKey: "id_categorie" });
 
 
 sequelize.authenticate()
@@ -124,4 +117,4 @@ sequelize.authenticate()
   .catch(err => console.error("Unable to connect to the database:" + err));
 
 
-sequelize.sync({ force: false, alter: true }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);
+sequelize.sync({ force:false, alter: true }).then(() => { console.log("Sync completed") }).catch(err => console.log("Error at creating: ") + err);

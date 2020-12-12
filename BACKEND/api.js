@@ -1,8 +1,20 @@
 import { app, router } from "./init/serverinit.js"
-import { Proiect, Category, User, Bugs,Comments } from "./sequelize/sequelize.js"
+import { Proiect, Category, User, Bugs, Comments } from "./sequelize/sequelize.js"
 
 
 ////---------------PROJECTS-----------------////
+router.route("/projectsWithBugs").get((req, res) => {
+
+  
+  Proiect.findAll({
+    include: [{
+      model: Bugs
+    }]
+  
+  }).then(response=>res.json(response));
+
+})
+
 
 router.route("/projects").get((req, res) => {
 
@@ -22,7 +34,8 @@ router.route("/projects").post((req, res) =>
   Proiect.create({
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
-    denumire: req.body.denumire
+    denumire: req.body.denumire,
+    id_categorie:req.body.id_categorie
   }).then((result) => res.json(result))
 );
 
@@ -32,7 +45,8 @@ router.route("/projects/:id_proiect").put((req, res) =>
   Proiect.update({
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
-    denumire: req.body.denumire
+    denumire: req.body.denumire,
+    id_categorie:req.body.id_categorie
   },
     {
       where: {
@@ -52,24 +66,7 @@ router.route("/projects/:id_proiect").delete((req, res) =>
 );
 
 
-router.route("/sequelize/projectsWithCategories").post((req, res) => {
-  Proiect.create({
 
-    descriere: req.body.descriere,
-    denumire: req.body.denumire
-  }).then(proiect => {
-
-    req.body.Category.forEach(categorie => {
-      Categorie.create({
-        id_categorie: categorie.body.id_categorie,
-        denumire_categ: categorie.denumire_categ,
-        descriere_categ: categorie.descriere_categ,
-        id_proiect: proiect.id_proiect
-      }).then(response => res.json(response)).catch(err => console.log(err))
-    })
-
-  }).catch(err => console.log(err))
-})
 
 ////---------------PROJECTS-----------------////
 
@@ -134,6 +131,31 @@ router.route("/comments/:id_comment").delete((req, res) =>
 ////---------------COMMENTS-----------------////
 ////---------------BUGS-----------------////
 
+router.route("/bugs/:id_bug").get((req, res) => {
+
+  Bugs.findByPk(req.params.id_bug).then((result) => res.json(result))
+}
+);
+
+
+router.route("/commentsfrombug/:id_bug").get((req,res)=>{
+  Bugs.findAll({
+            where: {
+                  id_bug:req.params.id_bug
+                  }
+              }
+  ).then(response=>res.json(response));
+})
+
+
+router.route("/bugs").get((req, res) => {
+
+ Bugs.findAll().then((record) => {
+    return res.json(record);
+  });
+
+})
+
 router.route("/bugs").post((req, res) =>
   Bugs.create({
     id_bug: req.body.id_bug,
@@ -142,7 +164,9 @@ router.route("/bugs").post((req, res) =>
     prioritate: req.body.prioritate,
     link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
-    id_user: req.body.id_user
+    id_proiect:req.body.id_proiect,
+    id_user:req.body.id_user
+    
   }).then((result) => res.json(result))
 );
 
@@ -156,8 +180,8 @@ router.route("/bugs/:id_bug").put((req, res) =>
     prioritate: req.body.prioritate,
     link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
-    id_user: req.body.id_user
-
+    id_user: req.body.id_user,
+    
   },
     {
       where: {
@@ -184,110 +208,99 @@ router.route("/bugs/:id_bug").delete((req, res) =>
 router.route("/users").get((req, res) => {
 
   User.findAll().then((User) => {
-  return res.json(User);
-});
+    return res.json(User);
+  });
 
 })
 
 router.route("/users/:id_user").get((req, res) => {
 
-User.findByPk(req.params.id_user).then((result) => res.json(result))
+  User.findByPk(req.params.id_user).then((result) => res.json(result))
 }
 );
 
-router.route("/users").post((req, res) =>
-{
-//validare username
-var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
-if( !req.body.username.match(usr))
-{
-    res.status(500).json({
-    message: "Invalid username"
-  });
-} 
-
-//validare email
-var em = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-if( !req.body.mail.match(em))
-{
-  res.status(500).json({
-    message: "Invalid email"
-  });
-}
-
-//validare parola
-var pass =  /^[A-Za-z]\w{7,14}$/;
-if(!req.body.parola.match(pass))
-{
-  res.status(500).json({
-    message: "Invalid password"
-  });
-}
-
-//creare user
-User.create({
-  username: req.body.username,
-  mail: req.body.mail,
-  parola: req.body.parola
-}).then((result) => res.json(result))
-});
-
-
-
-router.route("/users/:id_user").put((req, res) =>
-{
-if(req.body.username)
-{ 
+router.route("/users").post((req, res) => {
   //validare username
   var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
-  if(!req.body.username.match(usr))
-  {
-      res.status(500).json({
+  if (!req.body.username.match(usr)) {
+    res.status(500).json({
       message: "Invalid username"
     });
-  } 
-}
-if(req.body.mail)
-{ 
+  }
+
   //validare email
   var em = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-  if( !req.body.mail.match(em))
-  {
+  if (!req.body.mail.match(em)) {
     res.status(500).json({
       message: "Invalid email"
     });
   }
-}
-if(req.body.parola)
-{ 
+
   //validare parola
-  var pass =  /^[A-Za-z]\w{7,14}$/;
-  if(!req.body.parola.match(pass))
-  {
+  var pass = /^[A-Za-z]\w{7,14}$/;
+  if (!req.body.parola.match(pass)) {
     res.status(500).json({
       message: "Invalid password"
     });
   }
-}
-User.update({
-  username: req.body.username,
-  mail: req.body.mail,
-  parola: req.body.parola
-},
-  {
-    where: {
-      id_user: req.params.id_user
-    }
+
+  //creare user
+  User.create({
+    username: req.body.username,
+    mail: req.body.mail,
+    parola: req.body.parola
   }).then((result) => res.json(result))
+});
+
+
+
+router.route("/users/:id_user").put((req, res) => {
+  if (req.body.username) {
+    //validare username
+    var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
+    if (!req.body.username.match(usr)) {
+      res.status(500).json({
+        message: "Invalid username"
+      });
+    }
+  }
+  if (req.body.mail) {
+    //validare email
+    var em = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if (!req.body.mail.match(em)) {
+      res.status(500).json({
+        message: "Invalid email"
+      });
+    }
+  }
+  if (req.body.parola) {
+    //validare parola
+    var pass = /^[A-Za-z]\w{7,14}$/;
+    if (!req.body.parola.match(pass)) {
+      res.status(500).json({
+        message: "Invalid password"
+      });
+    }
+  }
+  User.update({
+    username: req.body.username,
+    mail: req.body.mail,
+    parola: req.body.parola
+  },
+    {
+      where: {
+        id_user: req.params.id_user
+      }
+    }).then((result) => res.json(result))
 }
 );
 
 router.route("/users/:id_user").delete((req, res) =>
-User.destroy({
-  where: {
-    id_user: req.params.id_user
-  }
-}).then((result) => res.json(result))
+  User.destroy({
+    where: {
+      id_user: req.params.id_user
+    }
+  }).then((result) => res.json(result))
 );
 
 
@@ -298,49 +311,64 @@ User.destroy({
 router.route("/categories").get((req, res) => {
 
   Category.findAll().then((Category) => {
-  return res.json(Category);
-});
+    return res.json(Category);
+  });
 
 })
 
 router.route("/categories/:id_categorie").get((req, res) => {
 
-//console.log("se apelieaza")
-Category.findByPk(req.params.id_categorie).then((result) => res.json(result))
+  //console.log("se apelieaza")
+  Category.findByPk(req.params.id_categorie).then((result) => res.json(result))
 }
 );
 
 router.route("/categories").post((req, res) =>
-Category.create({
-  id_categorie: req.body.id_categorie,
-  descriere_categ: req.body.descriere_categ,
-  denumire_categ: req.body.denumire_categ,
-  
-}).then((result) => res.json(result))
-);
-
-
-
-router.route("/categories/:id_categorie").put((req, res) =>
-Category.update({
-  id_categorie: req.body.id_categorie,
-  descriere_categ: req.body.descriere_categ,
-  denumire_categ: req.body.denumire_categ
-},
-  {
-    where: {
-      id_categorie: req.params.id_categorie
-    }
-
+  Category.create({
+    id_categorie: req.body.id_categorie,
+    descriere_categ: req.body.descriere_categ,
+    denumire_categ: req.body.denumire_categ,
+    id_proiect:req.body.id_proiect
 
   }).then((result) => res.json(result))
 );
 
 
+
+router.route("/categories/:id_categorie").put((req, res) =>
+  Category.update({
+    id_categorie: req.body.id_categorie,
+    descriere_categ: req.body.descriere_categ,
+    denumire_categ: req.body.denumire_categ,
+    id_proiect:req.body.id_proiect
+  },
+    {
+      where: {
+        id_categorie: req.params.id_categorie
+      }
+
+
+    }).then((result) => res.json(result))
+);
+
+
 router.route("/categories/:id").delete((req, res) => {
   Category.findByPk(req.params.id).then(record => {
-      record.destroy();
+    record.destroy();
   }).then(() => res.sendStatus(200));
+})
+
+
+router.route("/categoriesWithProjects").get((req, res) => {
+
+  
+  Category.findAll({
+    include: [{
+      model: Proiect
+    }]
+  
+  }).then(response=>res.json(response));
+
 })
 ////---------------CATEGORIES-----------------////
 
