@@ -1,17 +1,17 @@
 import { app, router } from "./init/serverinit.js"
-import { Proiect, Category, User, Bugs, Comments } from "./sequelize/sequelize.js"
+import { Proiect, Category, User, Bugs, Comments, Testers, Teams } from "./sequelize/sequelize.js"
 
 
 ////---------------PROJECTS-----------------////
 router.route("/projectsWithBugs").get((req, res) => {
 
-  
+
   Proiect.findAll({
     include: [{
       model: Bugs
     }]
-  
-  }).then(response=>res.json(response));
+
+  }).then(response => res.json(response));
 
 })
 
@@ -35,7 +35,7 @@ router.route("/projects").post((req, res) =>
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
     denumire: req.body.denumire,
-    id_categorie:req.body.id_categorie
+    id_categorie: req.body.id_categorie
   }).then((result) => res.json(result))
 );
 
@@ -46,7 +46,7 @@ router.route("/projects/:id_proiect").put((req, res) =>
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
     denumire: req.body.denumire,
-    id_categorie:req.body.id_categorie
+    id_categorie: req.body.id_categorie
   },
     {
       where: {
@@ -138,19 +138,19 @@ router.route("/bugs/:id_bug").get((req, res) => {
 );
 
 
-router.route("/commentsfrombug/:id_bug").get((req,res)=>{
+router.route("/commentsfrombug/:id_bug").get((req, res) => {
   Bugs.findAll({
-            where: {
-                  id_bug:req.params.id_bug
-                  }
-              }
-  ).then(response=>res.json(response));
+    where: {
+      id_bug: req.params.id_bug
+    }
+  }
+  ).then(response => res.json(response));
 })
 
 
 router.route("/bugs").get((req, res) => {
 
- Bugs.findAll().then((record) => {
+  Bugs.findAll().then((record) => {
     return res.json(record);
   });
 
@@ -164,9 +164,9 @@ router.route("/bugs").post((req, res) =>
     prioritate: req.body.prioritate,
     link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
-    id_proiect:req.body.id_proiect,
-    id_user:req.body.id_user
-    
+    id_proiect: req.body.id_proiect,
+    id_user: req.body.id_user
+
   }).then((result) => res.json(result))
 );
 
@@ -181,7 +181,7 @@ router.route("/bugs/:id_bug").put((req, res) =>
     link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
     id_user: req.body.id_user,
-    
+
   },
     {
       where: {
@@ -328,7 +328,7 @@ router.route("/categories").post((req, res) =>
     id_categorie: req.body.id_categorie,
     descriere_categ: req.body.descriere_categ,
     denumire_categ: req.body.denumire_categ,
-    id_proiect:req.body.id_proiect
+    id_proiect: req.body.id_proiect
 
   }).then((result) => res.json(result))
 );
@@ -340,7 +340,7 @@ router.route("/categories/:id_categorie").put((req, res) =>
     id_categorie: req.body.id_categorie,
     descriere_categ: req.body.descriere_categ,
     denumire_categ: req.body.denumire_categ,
-    id_proiect:req.body.id_proiect
+    id_proiect: req.body.id_proiect
   },
     {
       where: {
@@ -361,16 +361,122 @@ router.route("/categories/:id").delete((req, res) => {
 
 router.route("/categoriesWithProjects").get((req, res) => {
 
-  
+
   Category.findAll({
     include: [{
       model: Proiect
     }]
-  
-  }).then(response=>res.json(response));
+
+  }).then(response => res.json(response));
 
 })
 ////---------------CATEGORIES-----------------////
+
+////---------------TEAMS-----------------////
+
+
+
+router.route("/teams").get((req, res) => {
+
+  Teams.findAll().then((teams) => {
+    return res.json(teams);
+  });
+
+})
+
+router.route("/projects/:id").get((req, res) => {
+
+  Teams.findByPk(req.params.id).then((result) => res.json(result))
+}
+);
+
+router.route("/teams").post((req, res) =>
+  Teams.create({
+    id_proiect: req.body.id_proiect,
+    id_user:req.body.id_user
+  }).then((result) => res.json(result))
+);
+
+
+
+router.route("/projects/:id").put((req, res) =>
+  Teams.update({
+    id_proiect: req.body.id_proiect,
+    id_user:req.body.id_user
+  },
+    {
+      where: {
+        id_proiect: req.params.id
+      }
+
+
+    }).then((result) => res.json(result))
+);
+
+router.route("/projects/:id").delete((req, res) =>
+  Teams.destroy({
+    where: {
+      id_proiect: req.params.id
+    }
+  }).then((result) => res.json(result))
+);
+
+
+
+
+////---------------TEAMS-----------------////
+////---------------TESTERS-----------------////
+
+
+router.route("/testers").get((req, res) => {
+
+  Testers.findAll().then((tstr) => {
+    return res.json(tstr);
+  });
+
+})
+
+router.route("/testers/:id").get((req, res) => {
+
+  Testers.findByPk(req.params.id).then((result) => res.json(result))
+}
+);
+
+router.route("/testers").post((req, res) =>
+  Proiect.create({
+    id_user: req.body.id_user,
+    id_proiect: req.body.id_proiect
+  }).then((result) => res.json(result))
+);
+
+
+
+router.route("/testers/:id").put((req, res) =>
+  Testers.update({
+    id_user: req.body.id_user,
+    id_proiect: req.body.id_proiect
+  },
+    {
+      where: {
+        id: req.params.id
+      }
+
+
+    }).then((result) => res.json(result))
+);
+
+router.route("/projects/:id").delete((req, res) =>
+  Testers.destroy({
+    where: {
+      id_proiect: req.params.id
+    }
+  }).then((result) => res.json(result))
+);
+
+
+
+
+////---------------TESTERS-----------------////
 
 
 var port = 8001;

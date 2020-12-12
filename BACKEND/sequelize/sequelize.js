@@ -18,8 +18,15 @@ export const Proiect = sequelize.define("project", {
 
 })
 
+export const Teams = sequelize.define("Team", {
+  id_proiect:Sequelize.INTEGER(11),
+  id_user:Sequelize.INTEGER(11)
+});
 
-
+export const Testers= sequelize.define("tester", {
+  id_user:Sequelize.INTEGER(11),
+  id_proiect:Sequelize.INTEGER(11)
+});
 
 
 export const Comments = sequelize.define("Comments", {
