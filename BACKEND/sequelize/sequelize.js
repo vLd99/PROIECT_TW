@@ -1,10 +1,19 @@
 
 import Sequelize from "sequelize"
 
-export const sequelize = new Sequelize('bd_proiect_tw', 'root', '', {
-  host: 'localhost',
-  dialect: 'mysql'
-})
+const sequelize = new Sequelize(
+  "bd_proiect_tw","sa","sa", {
+  host: "localhost",
+  dialect: "mssql",
+  dialectOptions: {
+      options: {
+          //instanceName:"DESKTOP-L929KG2",
+          trustedConnection: true,
+          enableArithAbort: true
+      }
+  }
+}
+)
 
 export const Proiect = sequelize.define("project", {
   id_proiect: {

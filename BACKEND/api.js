@@ -205,6 +205,18 @@ router.route("/bugs/:id_bug").delete((req, res) =>
 
 ////---------------USERS-----------------////
 
+router.route("/login").post((req, res) => {
+  User.findAll({ where:{username: req.body.username, parola:req.body.parola}}).then(count=>{
+    if(count!=0){
+      //daca e true putem intra in aplicatie
+      res.status(200).json(true);
+    }else
+    //false userul e gresit
+    res.status(401).json(false)
+  });
+})
+
+
 router.route("/users").get((req, res) => {
 
   User.findAll().then((User) => {
@@ -393,7 +405,7 @@ router.route("/projects/:id").get((req, res) => {
 router.route("/teams").post((req, res) =>
   Teams.create({
     id_proiect: req.body.id_proiect,
-    id_user:req.body.id_user
+    id_user: req.body.id_user
   }).then((result) => res.json(result))
 );
 
@@ -402,7 +414,7 @@ router.route("/teams").post((req, res) =>
 router.route("/projects/:id").put((req, res) =>
   Teams.update({
     id_proiect: req.body.id_proiect,
-    id_user:req.body.id_user
+    id_user: req.body.id_user
   },
     {
       where: {
