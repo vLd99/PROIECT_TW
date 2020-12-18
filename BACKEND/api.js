@@ -1,9 +1,13 @@
 import { app, router } from "./init/serverinit.js"
-import { Proiect, Category, User, Bugs, Comments, Testers, Teams } from "./sequelize/sequelize.js"
+
+import { Proiect, Category, User, Bugs, Comments, Testers, Teams, sequelize } from "./sequelize/sequelize.js"
 
 
 ////---------------PROJECTS-----------------////
 router.route("/projectsWithBugs").get((req, res) => {
+
+
+
 
 
   Proiect.findAll({
@@ -12,6 +16,24 @@ router.route("/projectsWithBugs").get((req, res) => {
     }]
 
   }).then(response => res.json(response));
+
+})
+
+router.route("/projectWithBugs/:id_proiect").get((req, res) => {
+
+
+
+  Proiect.findAll({
+    include: [{
+      model: Bugs
+
+    }],
+    where: {
+      id_proiect: req.params.id_proiect
+    }
+
+  }).then(response => res.json(response));
+
 
 })
 
@@ -31,12 +53,25 @@ router.route("/projects/:id_proiect").get((req, res) => {
 );
 
 router.route("/projects").post((req, res) =>
+  // inseram un proiect
   Proiect.create({
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
     denumire: req.body.denumire,
-    id_categorie: req.body.id_categorie
-  }).then((result) => res.json(result))
+    id_categorie: req.body.id_categorie,
+
+  }).then((proiect) => {
+    for (let i = 0; i < req.body.users_ids.length; i++) {
+      Teams.create({
+        id_proiect: proiect.id_proiect,
+        id_user: req.body.users_ids[i]
+      })
+    }
+  })
+
+
+
+    .then((result) => res.json(result))
 );
 
 
@@ -142,7 +177,10 @@ router.route("/commentsfrombug/:id_bug").get((req, res) => {
   Bugs.findAll({
     where: {
       id_bug: req.params.id_bug
-    }
+    },
+    include: [{
+      model: Comments
+    }]
   }
   ).then(response => res.json(response));
 })
@@ -156,19 +194,49 @@ router.route("/bugs").get((req, res) => {
 
 })
 
-router.route("/bugs").post((req, res) =>
-  Bugs.create({
-    id_bug: req.body.id_bug,
-    severitate: req.body.severitate,
-    descriere: req.body.descriere,
-    prioritate: req.body.prioritate,
-    link_git: req.body.link_git,
-    id_categorie: req.body.id_categorie,
-    id_proiect: req.body.id_proiect,
-    id_user: req.body.id_user
 
-  }).then((result) => res.json(result))
-);
+
+router.route("/bugs").post((req, res) => {
+
+
+
+  let result = sequelize.query(
+    'SELECT id_proiect FROM testers WHERE id_user = :status',
+    {
+      replacements: { status: req.body.id_user },
+      type: sequelize.SELECT
+    }
+  ).then(result1 => {
+    console.log(result1[0][0].id_proiect)
+    if (result1[0][0].id_proiect == req.body.id_proiect) {
+
+      return Bugs.create({
+        id_bug: req.body.id_bug,
+        severitate: req.body.severitate,
+        descriere: req.body.descriere,
+        prioritate: req.body.prioritate,
+        id_categorie: req.body.id_categorie,
+        id_proiect: req.body.id_proiect,
+        id_user: req.body.id_user
+
+      }).then((result) => res.json(result))
+
+    }
+    else
+      return res.json({ message: "user is not a tester" })
+
+  }).catch(err => res.json(err.toString()))
+
+
+}
+
+)
+
+
+
+
+
+
 
 
 
@@ -206,13 +274,13 @@ router.route("/bugs/:id_bug").delete((req, res) =>
 ////---------------USERS-----------------////
 
 router.route("/login").post((req, res) => {
-  User.findAll({ where:{username: req.body.username, parola:req.body.parola}}).then(count=>{
-    if(count!=0){
-      //daca e true putem intra in aplicatie
-      res.status(200).json(true);
-    }else
-    //false userul e gresit
-    res.status(401).json(false)
+  User.findAll({ where: { mail: req.body.mail, parola: req.body.parola } }).then(count => {
+    if (count != 0) {
+      // putem intra in aplicatie
+      return res.status(200).json({ message: "Log in successful!" });
+    } else
+      //userul e gresit
+      return res.status(401).json({ message: "Username or password are incorrect" })
   });
 })
 
@@ -235,7 +303,7 @@ router.route("/users").post((req, res) => {
   //validare username
   var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
   if (!req.body.username.match(usr)) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Invalid username"
     });
   }
@@ -243,7 +311,7 @@ router.route("/users").post((req, res) => {
   //validare email
   var em = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
   if (!req.body.mail.match(em)) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Invalid email"
     });
   }
@@ -251,7 +319,7 @@ router.route("/users").post((req, res) => {
   //validare parola
   var pass = /^[A-Za-z]\w{7,14}$/;
   if (!req.body.parola.match(pass)) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Invalid password"
     });
   }
@@ -261,7 +329,11 @@ router.route("/users").post((req, res) => {
     username: req.body.username,
     mail: req.body.mail,
     parola: req.body.parola
-  }).then((result) => res.json(result))
+  }).then(() => {
+    res.json({ message: "Registration successfully" })
+
+  }).catch((err) => res.json({ message: err.toString() }))
+
 });
 
 
@@ -271,7 +343,7 @@ router.route("/users/:id_user").put((req, res) => {
     //validare username
     var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
     if (!req.body.username.match(usr)) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Invalid username"
       });
     }
@@ -280,7 +352,7 @@ router.route("/users/:id_user").put((req, res) => {
     //validare email
     var em = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     if (!req.body.mail.match(em)) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Invalid email"
       });
     }
@@ -289,7 +361,7 @@ router.route("/users/:id_user").put((req, res) => {
     //validare parola
     var pass = /^[A-Za-z]\w{7,14}$/;
     if (!req.body.parola.match(pass)) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Invalid password"
       });
     }
@@ -303,7 +375,11 @@ router.route("/users/:id_user").put((req, res) => {
       where: {
         id_user: req.params.id_user
       }
-    }).then((result) => res.json(result))
+    }).then(() => {
+      res.json({ message: "Modification was successfully" })
+
+    }).catch((err) => res.json({ message: err.toString() }))
+
 }
 );
 
@@ -312,10 +388,11 @@ router.route("/users/:id_user").delete((req, res) =>
     where: {
       id_user: req.params.id_user
     }
-  }).then((result) => res.json(result))
-);
+  }).then(() => {
+    res.json({ message: "Deleted" })
+  })
 
-
+)
 ////---------------USERS-----------------////
 
 ////---------------CATEGORIES-----------------////
@@ -330,7 +407,7 @@ router.route("/categories").get((req, res) => {
 
 router.route("/categories/:id_categorie").get((req, res) => {
 
-  //console.log("se apelieaza")
+
   Category.findByPk(req.params.id_categorie).then((result) => res.json(result))
 }
 );
@@ -455,9 +532,10 @@ router.route("/testers/:id").get((req, res) => {
 );
 
 router.route("/testers").post((req, res) =>
-  Proiect.create({
-    id_user: req.body.id_user,
-    id_proiect: req.body.id_proiect
+  Testers.create({
+    id_proiect: req.body.id_proiect,
+    id_user: req.body.id_user
+
   }).then((result) => res.json(result))
 );
 
@@ -465,8 +543,9 @@ router.route("/testers").post((req, res) =>
 
 router.route("/testers/:id").put((req, res) =>
   Testers.update({
-    id_user: req.body.id_user,
-    id_proiect: req.body.id_proiect
+    id_proiect: req.body.id_proiect,
+    id_user: req.body.id_user
+
   },
     {
       where: {
