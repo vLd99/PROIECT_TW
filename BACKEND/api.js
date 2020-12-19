@@ -5,11 +5,6 @@ import { Proiect, Category, User, Bugs, Comments, Testers, Teams, sequelize } fr
 
 ////---------------PROJECTS-----------------////
 router.route("/projectsWithBugs").get((req, res) => {
-
-
-
-
-
   Proiect.findAll({
     include: [{
       model: Bugs
@@ -20,9 +15,6 @@ router.route("/projectsWithBugs").get((req, res) => {
 })
 
 router.route("/projectWithBugs/:id_proiect").get((req, res) => {
-
-
-
   Proiect.findAll({
     include: [{
       model: Bugs
@@ -33,45 +25,40 @@ router.route("/projectWithBugs/:id_proiect").get((req, res) => {
     }
 
   }).then(response => res.json(response));
-
-
 })
 
 
 router.route("/projects").get((req, res) => {
-
   Proiect.findAll().then((proiect) => {
     return res.json(proiect);
   });
-
 })
 
 router.route("/projects/:id_proiect").get((req, res) => {
-
   Proiect.findByPk(req.params.id_proiect).then((result) => res.json(result))
 }
 );
 
 router.route("/projects").post((req, res) =>
-  // inseram un proiect
+  // inseram un proiect cu membrii echipei sale
   Proiect.create({
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
     denumire: req.body.denumire,
+    link_git:req.body.link_git,
     id_categorie: req.body.id_categorie,
+    
 
   }).then((proiect) => {
+    //users_ids va fi o lista/array construita la nivel de front-end care va contine
+    //id-urile membrilor adaugati la proiect si pe cel al cretorului
     for (let i = 0; i < req.body.users_ids.length; i++) {
       Teams.create({
         id_proiect: proiect.id_proiect,
         id_user: req.body.users_ids[i]
       })
     }
-  })
-
-
-
-    .then((result) => res.json(result))
+  }).then((result) => res.json(result))
 );
 
 
@@ -174,16 +161,32 @@ router.route("/bugs/:id_bug").get((req, res) => {
 
 
 router.route("/commentsfrombug/:id_bug").get((req, res) => {
-  Bugs.findAll({
-    where: {
-      id_bug: req.params.id_bug
-    },
-    include: [{
-      model: Comments
-    }]
-  }
-  ).then(response => res.json(response));
+ 
+  sequelize.query(
+    'SELECT id_proiect FROM teams WHERE id_user = :status',
+    {
+      replacements: { status: req.body.id_user },
+      type: sequelize.SELECT
+    }
+  ).then(result => {
+    console.log(result[0][0].id_proiect)
+    if (result[0][0].id_proiect == req.body.id_proiect) {
+ 
+        Bugs.findAll({
+          where: { 
+            id_bug: req.params.id_bug
+          },
+          include: [{
+            model: Comments
+          }]
+        }
+        ).then(response => res.json(response));
+      }
+      else
+      return res.json({ message: "user is not a project member" })
+  }).catch(err => res.json(err.toString()))
 })
+
 
 
 router.route("/bugs").get((req, res) => {
@@ -197,10 +200,7 @@ router.route("/bugs").get((req, res) => {
 
 
 router.route("/bugs").post((req, res) => {
-
-
-
-  let result = sequelize.query(
+  sequelize.query(
     'SELECT id_proiect FROM testers WHERE id_user = :status',
     {
       replacements: { status: req.body.id_user },
@@ -226,15 +226,7 @@ router.route("/bugs").post((req, res) => {
       return res.json({ message: "user is not a tester" })
 
   }).catch(err => res.json(err.toString()))
-
-
-}
-
-)
-
-
-
-
+})
 
 
 
@@ -246,7 +238,6 @@ router.route("/bugs/:id_bug").put((req, res) =>
     severitate: req.body.severitate,
     descriere: req.body.descriere,
     prioritate: req.body.prioritate,
-    link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
     id_user: req.body.id_user,
 
@@ -274,10 +265,12 @@ router.route("/bugs/:id_bug").delete((req, res) =>
 ////---------------USERS-----------------////
 
 router.route("/login").post((req, res) => {
-  User.findAll({ where: { mail: req.body.mail, parola: req.body.parola } }).then(count => {
-    if (count != 0) {
+  User.findAll({ where: { mail: req.body.mail, parola: req.body.parola } }).then(usr => {
+    if (usr != 0) {
       // putem intra in aplicatie
-      return res.status(200).json({ message: "Log in successful!" });
+      return res.status(200).json(
+     usr[0]
+);
     } else
       //userul e gresit
       return res.status(401).json({ message: "Username or password are incorrect" })
