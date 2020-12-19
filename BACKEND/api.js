@@ -249,7 +249,6 @@ router.route("/bugs/:id_bug").put((req, res) =>
 
 
     }).then((result) => res.json(result))
-
 )
 
 
