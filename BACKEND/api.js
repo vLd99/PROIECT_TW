@@ -64,6 +64,7 @@ router.route("/projects").post((req, res) =>
 
 
 router.route("/projects/:id_proiect").put((req, res) =>
+//validare ca modifarea se face de catre unul din membri echipei proiectului
   Proiect.update({
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
@@ -110,6 +111,7 @@ router.route("/comments/:id_comment").get((req, res) => {
 );
 
 router.route("/comments").post((req, res) =>
+//validare poate fi adaugat doar de catre un membru al unui proiect
   Comments.create({
     id_comment: req.body.id_comment,
     body: req.body.body,
@@ -123,6 +125,7 @@ router.route("/comments").post((req, res) =>
 
 
 router.route("/comments/:id_comment").put((req, res) =>
+//validare - la fel ca mai sus (edit-ul poate fi facut doar de cel care a lasat comentariul)
   Comments.update({
     id_comment: req.body.id_comment,
     body: req.body.body,
@@ -143,6 +146,7 @@ router.route("/comments/:id_comment").put((req, res) =>
 )
 
 router.route("/comments/:id_comment").delete((req, res) =>
+//valdiare la fel ca mai sus
   Comments.destroy({
     where: {
       id_comment: req.params.id_comment
@@ -233,6 +237,7 @@ router.route("/bugs").post((req, res) => {
 
 
 router.route("/bugs/:id_bug").put((req, res) =>
+//validare la fel ca mai sus
   Bugs.update({
     id_bug: req.body.id_bug,
     severitate: req.body.severitate,
@@ -254,6 +259,7 @@ router.route("/bugs/:id_bug").put((req, res) =>
 
 
 router.route("/bugs/:id_bug").delete((req, res) =>
+//validare pentru userul care l-a creat
   Bugs.destroy({
     where: {
       id_bug: req.params.id_bug
@@ -331,6 +337,8 @@ router.route("/users").post((req, res) => {
 
 
 router.route("/users/:id_user").put((req, res) => {
+
+  //trebuie adauga validare pentru editarea detaliilor dar de catre userul curent in aplicatie
   if (req.body.username) {
     //validare username
     var usr = /^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$/;
@@ -376,6 +384,7 @@ router.route("/users/:id_user").put((req, res) => {
 );
 
 router.route("/users/:id_user").delete((req, res) =>
+//trebuie adauga adaugata acc validare ca mai sus
   User.destroy({
     where: {
       id_user: req.params.id_user
@@ -465,7 +474,7 @@ router.route("/teams").get((req, res) => {
 
 })
 
-router.route("/projects/:id").get((req, res) => {
+router.route("/teams/:id").get((req, res) => {
 
   Teams.findByPk(req.params.id).then((result) => res.json(result))
 }
@@ -480,7 +489,7 @@ router.route("/teams").post((req, res) =>
 
 
 
-router.route("/projects/:id").put((req, res) =>
+router.route("/teams/:id").put((req, res) =>
   Teams.update({
     id_proiect: req.body.id_proiect,
     id_user: req.body.id_user
@@ -494,7 +503,7 @@ router.route("/projects/:id").put((req, res) =>
     }).then((result) => res.json(result))
 );
 
-router.route("/projects/:id").delete((req, res) =>
+router.route("/teams/:id").delete((req, res) =>
   Teams.destroy({
     where: {
       id_proiect: req.params.id
@@ -548,6 +557,7 @@ router.route("/testers").post((req, res) => {
 
 
 router.route("/testers/:id").put((req, res) =>
+//verificare dupa id_userului curent in aplicatie
   Testers.update({
     id_proiect: req.body.id_proiect,
     id_user: req.body.id_user
@@ -562,7 +572,7 @@ router.route("/testers/:id").put((req, res) =>
     }).then((result) => res.json(result))
 );
 
-router.route("/projects/:id").delete((req, res) =>
+router.route("/testers/:id").delete((req, res) =>
   Testers.destroy({
     where: {
       id_proiect: req.params.id
