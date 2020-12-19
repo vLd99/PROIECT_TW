@@ -45,9 +45,9 @@ router.route("/projects").post((req, res) =>
     id_proiect: req.body.id_proiect,
     descriere: req.body.descriere,
     denumire: req.body.denumire,
-    link_git:req.body.link_git,
+    link_git: req.body.link_git,
     id_categorie: req.body.id_categorie,
-    
+
 
   }).then((proiect) => {
     //users_ids va fi o lista/array construita la nivel de front-end care va contine
@@ -161,7 +161,7 @@ router.route("/bugs/:id_bug").get((req, res) => {
 
 
 router.route("/commentsfrombug/:id_bug").get((req, res) => {
- 
+
   sequelize.query(
     'SELECT id_proiect FROM teams WHERE id_user = :status',
     {
@@ -171,18 +171,18 @@ router.route("/commentsfrombug/:id_bug").get((req, res) => {
   ).then(result => {
     console.log(result[0][0].id_proiect)
     if (result[0][0].id_proiect == req.body.id_proiect) {
- 
-        Bugs.findAll({
-          where: { 
-            id_bug: req.params.id_bug
-          },
-          include: [{
-            model: Comments
-          }]
-        }
-        ).then(response => res.json(response));
+
+      Bugs.findAll({
+        where: {
+          id_bug: req.params.id_bug
+        },
+        include: [{
+          model: Comments
+        }]
       }
-      else
+      ).then(response => res.json(response));
+    }
+    else
       return res.json({ message: "user is not a project member" })
   }).catch(err => res.json(err.toString()))
 })
@@ -268,8 +268,8 @@ router.route("/login").post((req, res) => {
     if (usr != 0) {
       // putem intra in aplicatie
       return res.status(200).json(
-     usr[0]
-);
+        usr[0]
+      );
     } else
       //userul e gresit
       return res.status(401).json({ message: "Username or password are incorrect" })
@@ -523,14 +523,28 @@ router.route("/testers/:id").get((req, res) => {
 }
 );
 
-router.route("/testers").post((req, res) =>
-  Testers.create({
-    id_proiect: req.body.id_proiect,
-    id_user: req.body.id_user
+router.route("/testers").post((req, res) => {
 
-  }).then((result) => res.json(result))
-);
+  sequelize.query(
+    'SELECT id_proiect FROM teams WHERE id_user = :status',
+    {
+      replacements: { status: req.body.id_user },
+      type: sequelize.SELECT
+    }
+  ).then(result => {
+    //console.log(result[0][0].id_proiect)
+    if (result[0][0]===undefined ) {
 
+      return Testers.create({
+        id_proiect: req.body.id_proiect,
+        id_user: req.body.id_user
+
+      }).then((result) => res.json(result))
+    }
+    else 
+      return res.json({ message: "user is already member to this project" })
+  }).catch(err => res.json(err.toString()))
+})
 
 
 router.route("/testers/:id").put((req, res) =>
