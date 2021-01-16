@@ -18,6 +18,7 @@
   display:table;
   width: 75%;
   margin: auto;
+  
  }
 
 .left{
@@ -45,15 +46,30 @@
     /*display property will be overriden as any class further inside this scope*/
     display: block;
     width: auto;
+    height: auto;
     padding-bottom: 2%;
 
     
   }
 
+
+  .container{
+    height: 100vh;
+  }
   #animLogIn{
-    width: 50%;
+    
+    float: left;
+    margin: auto;
+    display: block;
+    
   }
 
+  #logInContainer{
+   
+width: fit-content;
+    
+  }
+  
  
 
   

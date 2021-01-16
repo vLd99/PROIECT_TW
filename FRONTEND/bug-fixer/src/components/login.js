@@ -111,7 +111,7 @@ class Login extends Component {
 
 
                 <div >
-                <Container id="logInContainer" style={{ float:"left" ,marginTop:"5%",marginLeft:"30%", backgroundColor:"#FFE4C4", width:280, height:"300px", borderRadius:"25px"}}>
+                <Container id="logInContainer" style={{ float:"left" ,marginTop:"5%",marginLeft:"30%", backgroundColor:"#FFE4C4", width:300, height:"300px", borderRadius:"25px"}}>
                 <div style={{height:"20px"}}></div>
                 
                 <FormControl>

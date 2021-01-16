@@ -9,6 +9,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import {RETURN_USER} from "../redux/actionCreators"
+import {connect} from "react-redux"
+import {bindActionCreators} from "redux"
+
 
 
 
@@ -150,21 +154,23 @@ class Home extends Component {
         //this.addRows();
         //console.log(this.state.data);
         
+        if(this.props.user.user){
         
         return (
 
 
-            <div style={{ backgroundColor: "#FFF6EB", height:"100vh", width:"100%", minWidth:"100vw"}}>
+            <div style={{ backgroundColor: "#FFF6EB", height:"100%", width:"100%", minWidth:"100vw"}}>
                 <Typography id="welcomeMsg" style={{ fontFamily:"", paddingBottom: "5%", paddingTop: "1.5%" }} variant="h5" color="textPrimary"  >
 
 
-                    Welcome to our app {this.props.username}! Here is a list that contains all the current projects available right now.
+                You are logged in.
+                    
 
 
                 </Typography>
 
 
-                <div className="container">
+                <div className="container" style={{height:"120vh"}}>
 
                 {/*
                   <div>
@@ -269,7 +275,141 @@ class Home extends Component {
             </div>
           
 
-        )
+        )}
+        else
+        {
+            return (
+
+
+                <div style={{ backgroundColor: "#FFF6EB", height:"100%", width:"100%", minWidth:"100vw"}}>
+                    <Typography id="welcomeMsg" style={{ fontFamily:"", paddingBottom: "5%", paddingTop: "1.5%" }} variant="h5" color="textPrimary"  >
+    
+                    Welcome to our app! Here is a list that contains all the current projects available right now.
+                      
+    
+    
+                    </Typography>
+    
+    
+                    <div className="container" style={{height:"120vh"}}>
+    
+                    {/*
+                      <div>
+                            {this.state.data.categories.map(categorie => {
+                                return (<h1 key={categorie.id_categorie}></h1>)
+                            })}
+                        </div>
+    
+                        */}
+                        <div className="left"   >
+                            <TableContainer component={Paper}>
+                                <Table aria-label="simple table">
+                                    <TableHead style={{ backgroundColor: "#FFE4C4"  }}>
+                                        <TableRow>
+                                            <TableCell>TEHNOLOGII WEB</TableCell>
+                                            <TableCell align="right">ID:</TableCell>
+    
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {
+                                            
+                                            this.state.loaded && this.state.filterdProjects1.map((row) => (
+                                            <TableRow key={row.id_proiect  }>
+                                                <TableCell component="th" scope="row">
+                                                    <Link style={{textDecoration:'none', color:"#931621"}}
+                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                </TableCell>
+                                                <TableCell align="right">{row.id_proiect}</TableCell>
+    
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+    
+                        </div>
+    
+    
+                        <div className="center"  >
+                            <TableContainer component={Paper}>
+                                <Table aria-label="simple table">
+                                    <TableHead style={{ backgroundColor: "#FFE4C4", height: "100%" }}>
+                                        <TableRow>
+                                            <TableCell>ANDROID</TableCell>
+    
+                                            <TableCell align="right">ID:</TableCell>
+    
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody id="tableBody2">
+                                        { this.state.loaded &&this.state.filterdProjects2.map((row) => (
+                                            <TableRow key={row.id_proiect}>
+                                                <TableCell component="th" scope="row">
+                                                <Link style={{textDecoration:'none', color:"#931621"}}
+                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                </TableCell>
+    
+                                                <TableCell align="right">{row.id_proiect}</TableCell>
+    
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+    
+                        </div>
+    
+                        <div className="right" >
+                            <TableContainer component={Paper}>
+                                <Table aria-label="simple table">
+                                    <TableHead style={{ backgroundColor: "#FFE4C4", height: "100%" }}> 
+                                        <TableRow>
+                                            <TableCell>MULTIMEDIA</TableCell>
+                                            <TableCell align="right">ID:</TableCell>
+    
+                                        </TableRow>
+                                    </TableHead >
+                                    <TableBody>
+                                        {  this.state.loaded && this.state.filterdProjects3.map((row) => (
+                                            
+                                            <TableRow key={row.id_proiect}>
+                                                <TableCell component="th" scope="row">
+                                                <Link style={{textDecoration:'none', color:"#931621"}}
+                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                </TableCell>
+    
+                                                <TableCell align="right">{row.id_proiect}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+    
+                        </div>
+    
+    
+    
+    
+                    </div>
+                               
+                </div>
+              
+    
+            )
+        }
     }
 }
-export default withRouter(Home);
+function mapStateToProps(state) {
+    return {
+       user: state
+    }
+}
+
+function mapDispachToProps(dispach) {
+    return {
+        actions: bindActionCreators({ RETURN_USER }, dispach)
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispachToProps)(Home));
