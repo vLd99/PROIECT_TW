@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Typography, ButtonGroup, Box } from '@material-ui/core'
+import {  Typography } from '@material-ui/core'
 import {Link} from "react-router-dom"
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,10 +11,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
-
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
 
 
 
@@ -44,9 +40,9 @@ class Home extends Component {
             const response = await fetch("http://localhost:8001/api/projects");
             const data = await response.json();
 
-            const filterdProjects1=new Array();
+            const filterdProjects1 =new Array();
             data.forEach(element => {
-                if(element.id_categorie==1)
+                if(element.id_categorie===1)
                 {let clone =JSON.parse(JSON.stringify(element))
                 filterdProjects1.push(clone);
                 }
@@ -54,7 +50,7 @@ class Home extends Component {
 
             const filterdProjects2=new Array();
             data.forEach(element => {
-                if(element.id_categorie==2)
+                if(element.id_categorie===2)
                 {let clone =JSON.parse(JSON.stringify(element))
                     filterdProjects2.push(clone);
                     }
@@ -63,7 +59,7 @@ class Home extends Component {
 
             const filterdProjects3=new Array();
             data.forEach(element => {
-                if(element.id_categorie==3)
+                if(element.id_categorie===3)
                 {let clone =JSON.parse(JSON.stringify(element))
                     filterdProjects3.push(clone);
                     }
@@ -150,17 +146,19 @@ class Home extends Component {
 
     render() {
         const props = this.props;
+        console.log(props);
         //this.addRows();
-        console.log(this.state.data);
+        //console.log(this.state.data);
         
         
         return (
 
 
-            <div style={{ backgroundColor: "#FFF6EB", height: "70vw" }}>
-                <Typography style={{ paddingBottom: "5%", paddingTop: "1.5%" }} variant="h6" color="textPrimary"  >
+            <div style={{ backgroundColor: "#FFF6EB", height:"100vh", width:"100%", minWidth:"100vw"}}>
+                <Typography id="welcomeMsg" style={{ fontFamily:"", paddingBottom: "5%", paddingTop: "1.5%" }} variant="h5" color="textPrimary"  >
 
-                    Welcome to our app! Here is a list that contains all the current projects available right now.
+
+                    Welcome to our app {this.props.username}! Here is a list that contains all the current projects available right now.
 
 
                 </Typography>
@@ -179,7 +177,7 @@ class Home extends Component {
                     <div className="left"   >
                         <TableContainer component={Paper}>
                             <Table aria-label="simple table">
-                                <TableHead style={{ backgroundColor: "#FFE4C4", height: "45vw" }}>
+                                <TableHead style={{ backgroundColor: "#FFE4C4"  }}>
                                     <TableRow>
                                         <TableCell>TEHNOLOGII WEB</TableCell>
                                         <TableCell align="right">ID:</TableCell>

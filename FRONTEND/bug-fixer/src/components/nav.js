@@ -9,17 +9,20 @@ class Nav extends Component {
 
     render() {
         const props = this.props;
+        console.log('NAV PROPS')
         console.log(props);
 
         return (
             <React.Fragment>
-                <AppBar style={{ position: "relative", backgroundColor: "#FFE4C4" }}>
+                <AppBar style={{ position: "relative", backgroundColor: "#FFE4C4" ,width:"100%"}}>
                     <Toolbar>
                        
                             <Button
                                 style={{ color: "white" }}
-                                onClick={() => {
+                                onClick={  () => {
+                                  
                                     props.history.push("/")
+                                    
                                 }}
                             >
                                 
@@ -27,19 +30,22 @@ class Nav extends Component {
                                 
                             </Button>
 
-                            <Typography variant="h6" color="textPrimary"  >
+                            <Typography id="slogan" fontSize="15rem" variant="h6" color="textPrimary"  >
 
                                 Let's fix your app togheter!
                                 
 
                         </Typography>
 
-                        
+                        <div style={{flex:1}}></div>
                                 
-                        <div style={{display:"flex", marginLeft:"70%"}}>
+                        { !(this.props.username) && 
+
+                       
+                        <div className="appBarButtons" >
                             
                             <Button variant= "contained"
-                            //de adaugat un medie query pt dispozitive mai mici -> margin left mai mic
+                           
                             style={{ color: "white" ,backgroundColor:"#931621"}}
                                 onClick={() => {
                                     props.history.push("/Login")
@@ -64,8 +70,9 @@ class Nav extends Component {
                                     REGISTER
                                
                             </Button>
+                    
                             </div>
-                                    
+                        }                
                     </Toolbar>
 
                     
