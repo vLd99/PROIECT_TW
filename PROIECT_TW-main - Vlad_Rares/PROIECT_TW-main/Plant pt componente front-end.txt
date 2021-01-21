@@ -1,0 +1,23 @@
+Componente front-end:
+Cristi T: pagina de home - sus navbar cu logo -> catre home
+					      -> log in 
+					      -> register
+
+				in main apare o lista cu categorii-> in fiecare categorie apar proiectele
+							optiunea de adaugare proiect  -> creare formular
+
+				joi as tester					
+
+Vlad: pagina de proiect afasare lista de bug uri a proiectului respectiv 
+		pagina unui singur bug (comentarii etc) join as tester
+
+Cristi P: pagina de detalii a user ului 
+
+ruta de inreregistrare: Eryk sau Rares 
+
+culori: #ffe4c4  -> si alte nuante
+	rosu -> si alte nuante
+	negru 
+			
+
+https://coolors.co/931621-ffe4c4-050404-938ba1-61e786
