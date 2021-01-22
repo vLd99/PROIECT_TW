@@ -4,7 +4,8 @@ import anim2 from "../icons/anim2.gif"
 import {RETURN_USER} from "../redux/actionCreators"
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-
+import Profile from "./profile"
+import Home from "./home"
 class Login extends Component {
 
    
@@ -83,8 +84,13 @@ class Login extends Component {
                 userData:data
             })
             this.RETURN_USER(data.id_user);
+            localStorage.setItem("username",data.username);
+            localStorage.setItem("id",data.id_user);
+            localStorage.setItem("email",data.mail);
             console.log("aici");
             console.log(this.props)
+
+           
             
 
         }
@@ -100,7 +106,7 @@ class Login extends Component {
 
     render() {
 
-        if(this.state.isLoggedIn==false){
+        if(this.state.isLoggedIn===false){
      
         return (
 
@@ -156,12 +162,7 @@ class Login extends Component {
         else
         {
             return(
-                <div>
-                <h1 >
-                     Welcome {this.state.userData.username}
-                   
-                </h1>
-                </div>
+              <Home></Home>
                
             )
         }

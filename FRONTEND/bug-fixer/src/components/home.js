@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import {  Typography } from '@material-ui/core'
+import {  Button, Typography } from '@material-ui/core'
 import {Link} from "react-router-dom"
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,7 +12,10 @@ import Paper from '@material-ui/core/Paper';
 import {RETURN_USER} from "../redux/actionCreators"
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-
+import plus from "../icons/plus.png"
+import plusWhite from "../icons/plusWhite.png"
+import { CircularProgress } from "@material-ui/core"
+import EditIcon from '@material-ui/icons/Edit';
 
 
 
@@ -90,17 +93,62 @@ class Home extends Component {
 
         
     }
+    async DeleteProject(id_project,id_categorie) {
+        try {
+            const response = await fetch(`http://localhost:8001/api/projects/${id_project}`, {
+                method: "DELETE"
+            });
+            const data = await response.json();
+   
+
+            let x=[];
+            let y=[];
+            let z=[];
+            const props=this.props;
+
+            x=JSON.parse(localStorage.getItem("projects1"));
+            y=JSON.parse(localStorage.getItem("projects2"));
+            z=JSON.parse(localStorage.getItem("projects3"));
+           
+            
+          
+
+            if(id_categorie===1){
+                for(let i=0;i<x.length;i++){
+                    if(x[i].id_proiect==id_project){
+                        console.log("s a gasit elementul care trebuie sters")
+                        x.splice(i,1)
+                        console.log("array ul dupa splice")
+                        console.log(x)
+                    }
+                }
+                
+            localStorage.setItem("projects1",JSON.stringify(x));
+            }
+            else if(id_categorie===2){
+                localStorage.setItem("projects2",JSON.stringify(y));
+            }else{
+                localStorage.setItem("projects3",JSON.stringify(z));
+            }
+
+
+           
+           this.props.history.push("/")
+           this.render()
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
 
 
     componentDidMount() {
         
-       
-
         const Projects = JSON.parse(localStorage.getItem("projects"))
         const Projects1 = JSON.parse(localStorage.getItem("projects1"))
         const Projects2 = JSON.parse(localStorage.getItem("projects2"))
         const Projects3 = JSON.parse(localStorage.getItem("projects3"))
+
 
         if (Object.keys(Projects).length !== 0) {
             this.setState(prevState => ({
@@ -117,6 +165,7 @@ class Home extends Component {
             }))
 
             
+       
           
         }
         else {
@@ -151,6 +200,7 @@ class Home extends Component {
     render() {
         const props = this.props;
         console.log(props);
+        console.log(this.state.filterdProjects1)
         //this.addRows();
         //console.log(this.state.data);
         
@@ -159,7 +209,7 @@ class Home extends Component {
         return (
 
 
-            <div style={{ backgroundColor: "#FFF6EB", height:"100%", width:"100%", minWidth:"100vw"}}>
+            <div style={{ backgroundColor: "#FFF6EB", height:"100%", width:"100%", maxWidth:"100%"}}>
                 <Typography id="welcomeMsg" style={{ fontFamily:"", paddingBottom: "5%", paddingTop: "1.5%" }} variant="h5" color="textPrimary"  >
 
 
@@ -185,22 +235,73 @@ class Home extends Component {
                             <Table aria-label="simple table">
                                 <TableHead style={{ backgroundColor: "#FFE4C4"  }}>
                                     <TableRow>
-                                        <TableCell>TEHNOLOGII WEB</TableCell>
+                                        <TableCell>TEHNOLOGII WEB
+                                        <div className="divider">
+
+                                        </div>
+                                     
+                                            <Link style={{textDecoration:'none', color:"#931621"}}
+                                                 to ={{pathname:`addProject`,   state: {
+                                                    id_categorie:this.state.filterdProjects1[0]
+                                                }}}>
+
+                                            <Button variant = "contained" 
+                                                style={{ color: "white" , backgroundColor:"#931621"}}
+                                                
+                                          
+                                               >  
+                                                <img src={plusWhite} alt="add-proj" height="23px" width="23px"></img>
+                                              
+                                                
+                                               
+                                                
+                                               
+                                            </Button>
+                                                 </Link>
+
+                                        </TableCell>
+                                        
                                         <TableCell align="right">ID:</TableCell>
+                                        <TableCell align="right">Edit:</TableCell>
+                                       
 
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                     {this.state.loading && <CircularProgress></CircularProgress>}
                                     {
                                         
                                         this.state.loaded && this.state.filterdProjects1.map((row) => (
                                         <TableRow key={row.id_proiect  }>
                                             <TableCell component="th" scope="row">
                                                 <Link style={{textDecoration:'none', color:"#931621"}}
-                                                 to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                
+                                                to ={{pathname:`project/${row.id_proiect}`,
+                                                state: {
+                                                   id_p: `${row.id_proiect}`
+                                               }
+                                                }}
+                                                >{row.denumire}</Link>
                                             </TableCell>
                                             <TableCell align="right">{row.id_proiect}</TableCell>
+                                            <TableCell>
+                                            <Link 
+                                            style={{textDecoration:'none', color:"#931621"}}
+                                            to={{
+                                                    pathname: `/EditProject/${row.id_proiect}`, state: {
+                                                        id_p: `${row.id_proiect}`,
+                                                        desc: `${row.descriere}`,
+                                                        link_git: `${row.link_git}`,
+                                                        denumire: `${row.denumire}`,
+                                                        id_categorie: `${row.id_categorie}`,
+                                                        
 
+                                                    }
+                                                }}>
+                                                    <EditIcon />
+                                                </Link>
+                                                </TableCell>
+                                            
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -215,21 +316,70 @@ class Home extends Component {
                             <Table aria-label="simple table">
                                 <TableHead style={{ backgroundColor: "#FFE4C4", height: "100%" }}>
                                     <TableRow>
-                                        <TableCell>ANDROID</TableCell>
+                                        <TableCell>DAM - ANDROID
+                                        <div className="divider">
+
+                            </div>
+                            <Link style={{textDecoration:'none', color:"#931621"}}
+                                                 to ={{pathname:`addProject`,   state: {
+                                                    id_categorie:this.state.filterdProjects2[0]
+                                                }}}>
+
+                                            <Button variant = "contained" 
+                                                style={{ color: "white" , backgroundColor:"#931621"}}
+                                                
+                                          
+                                               >  
+                                                <img src={plusWhite} alt="add-proj" height="23px" width="23px"></img>
+                                              
+                                                
+                                               
+                                                
+                                               
+                                            </Button>
+                                                 </Link>
+                                        </TableCell>
 
                                         <TableCell align="right">ID:</TableCell>
+                                        <TableCell align="right">Edit:</TableCell>
+                                  
+
 
                                     </TableRow>
                                 </TableHead>
                                 <TableBody id="tableBody2">
+                                {this.state.loading && <CircularProgress></CircularProgress>}
                                     { this.state.loaded &&this.state.filterdProjects2.map((row) => (
                                         <TableRow key={row.id_proiect}>
                                             <TableCell component="th" scope="row">
                                             <Link style={{textDecoration:'none', color:"#931621"}}
-                                                 to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                 to ={{pathname:`project/${row.id_proiect}`,
+                                                 state: {
+                                                    id_p: `${row.id_proiect}`
+                                                }
+                                                 }}
+                                                
+                                                >{row.denumire}</Link>
                                             </TableCell>
 
                                             <TableCell align="right">{row.id_proiect}</TableCell>
+                                            <TableCell>
+                                            <Link 
+                                            style={{textDecoration:'none', color:"#931621"}}
+                                            to={{
+                                                    pathname: `/EditProject/${row.id_proiect}`, state: {
+                                                        id_p: `${row.id_proiect}`,
+                                                        desc: `${row.descriere}`,
+                                                        link_git: `${row.link_git}`,
+                                                        denumire: `${row.denumire}`,
+                                                        id_categorie: `${row.id_categorie}`,
+                                                        
+
+                                                    }
+                                                }}>
+                                                    <EditIcon />
+                                                </Link>
+                                                </TableCell>
 
                                         </TableRow>
                                     ))}
@@ -244,21 +394,73 @@ class Home extends Component {
                             <Table aria-label="simple table">
                                 <TableHead style={{ backgroundColor: "#FFE4C4", height: "100%" }}> 
                                     <TableRow>
-                                        <TableCell>MULTIMEDIA</TableCell>
+                                        <TableCell>MULTIMEDIA
+
+                                        <div className="divider">
+
+                                        </div>
+                                                 
+                                        <Link style={{textDecoration:'none', color:"#931621"}}
+                                                 to ={{pathname:`addProject`,   state: {
+                                                    id_categorie:this.state.filterdProjects3[0]
+                                                }}}>
+
+                                            <Button variant = "contained" 
+                                                style={{ color: "white" , backgroundColor:"#931621"}}
+                                                
+                                          
+                                               >  
+                                                <img src={plusWhite} alt="add-proj" height="23px" width="23px"></img>
+                                              
+                                                
+                                               
+                                                
+                                               
+                                            </Button>
+                                                 </Link>
+                                        </TableCell>
+
+
+
                                         <TableCell align="right">ID:</TableCell>
+                                        <TableCell align="right">Edit:</TableCell>
+                                      
 
                                     </TableRow>
                                 </TableHead >
                                 <TableBody>
+                                {this.state.loading && <CircularProgress></CircularProgress>}
                                     {  this.state.loaded && this.state.filterdProjects3.map((row) => (
                                         
                                         <TableRow key={row.id_proiect}>
                                             <TableCell component="th" scope="row">
                                             <Link style={{textDecoration:'none', color:"#931621"}}
-                                                 to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+
+                                                 to ={{pathname:`project/${row.id_proiect}`,
+                                                     state: {
+                                                        id_p: `${row.id_proiect}`
+                                                    }
+                                                     }}>{row.denumire}</Link>
                                             </TableCell>
 
                                             <TableCell align="right">{row.id_proiect}</TableCell>
+                                            <TableCell>
+                                            <Link 
+                                            style={{textDecoration:'none', color:"#931621"}}
+                                            to={{
+                                                    pathname: `/EditProject/${row.id_proiect}`, state: {
+                                                        id_p: `${row.id_proiect}`,
+                                                        desc: `${row.descriere}`,
+                                                        link_git: `${row.link_git}`,
+                                                        denumire: `${row.denumire}`,
+                                                        id_categorie: `${row.id_categorie}`,
+                                                        
+
+                                                    }
+                                                }}>
+                                                    <EditIcon />
+                                                </Link>
+                                                </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -312,13 +514,18 @@ class Home extends Component {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
+                                    {this.state.loading && <CircularProgress></CircularProgress>}
                                         {
                                             
                                             this.state.loaded && this.state.filterdProjects1.map((row) => (
                                             <TableRow key={row.id_proiect  }>
                                                 <TableCell component="th" scope="row">
                                                     <Link style={{textDecoration:'none', color:"#931621"}}
-                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                     to ={{pathname:`project/${row.id_proiect}`,
+                                                     state: {
+                                                        id_p: `${row.id_proiect}`
+                                                    }
+                                                     }}>{row.denumire}</Link>
                                                 </TableCell>
                                                 <TableCell align="right">{row.id_proiect}</TableCell>
     
@@ -336,18 +543,23 @@ class Home extends Component {
                                 <Table aria-label="simple table">
                                     <TableHead style={{ backgroundColor: "#FFE4C4", height: "100%" }}>
                                         <TableRow>
-                                            <TableCell>ANDROID</TableCell>
+                                            <TableCell>DAM - ANDROID</TableCell>
     
                                             <TableCell align="right">ID:</TableCell>
     
                                         </TableRow>
                                     </TableHead>
                                     <TableBody id="tableBody2">
+                                    {this.state.loading && <CircularProgress></CircularProgress>}
                                         { this.state.loaded &&this.state.filterdProjects2.map((row) => (
                                             <TableRow key={row.id_proiect}>
                                                 <TableCell component="th" scope="row">
                                                 <Link style={{textDecoration:'none', color:"#931621"}}
-                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                      to ={{pathname:`project/${row.id_proiect}`,
+                                                      state: {
+                                                         id_p: `${row.id_proiect}`
+                                                     }
+                                                      }}>{row.denumire}</Link>
                                                 </TableCell>
     
                                                 <TableCell align="right">{row.id_proiect}</TableCell>
@@ -371,12 +583,18 @@ class Home extends Component {
                                         </TableRow>
                                     </TableHead >
                                     <TableBody>
+
+                                    {this.state.loading && <CircularProgress></CircularProgress>}
                                         {  this.state.loaded && this.state.filterdProjects3.map((row) => (
                                             
                                             <TableRow key={row.id_proiect}>
                                                 <TableCell component="th" scope="row">
                                                 <Link style={{textDecoration:'none', color:"#931621"}}
-                                                     to ={{pathname:`project/${row.id_proiect}`}}>{row.denumire}</Link>
+                                                    to ={{pathname:`project/${row.id_proiect}`,
+                                                    state: {
+                                                       id_p: `${row.id_proiect}`
+                                                   }
+                                                    }}>{row.denumire}</Link>
                                                 </TableCell>
     
                                                 <TableCell align="right">{row.id_proiect}</TableCell>

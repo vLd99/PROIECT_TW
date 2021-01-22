@@ -6,15 +6,14 @@ import {RETURN_USER} from "../redux/actionCreators"
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import usr from "../icons/usr.png"
-
+import logout from "../icons/logout.png"
 
 class Nav extends Component {
 
 
     render() {
         const props = this.props;
-        console.log('NAV PROPS')
-        console.log(props);
+        
 
 
         if(!this.props.user.user){
@@ -38,7 +37,7 @@ class Nav extends Component {
 
                             <Typography id="slogan" fontSize="15rem" variant="h6" color="textPrimary"  >
 
-                                Let's fix your app togheter!
+                                Let's fix your app together!
                                 
 
                         </Typography>
@@ -111,7 +110,7 @@ class Nav extends Component {
                 
                                             <Typography id="slogan" fontSize="15rem" variant="h6" color="textPrimary"  >
                 
-                                                Let's fix your app togheter!
+                                                Let's fix your app together!
                                                 
                 
                                         </Typography>
@@ -133,10 +132,28 @@ class Nav extends Component {
                                             
                                             <Button variant = "contained" 
                                                 style={{ color: "white" , backgroundColor:"#931621"}}
-                                                onClick={() => {
-                                                    
+                                                onClick={() => {    
+                                                    props.history.push("/Profile")
                                                 }}>
                                                 <img src={usr} alt="usr" height="40px" width="40"></img>
+                                                
+                                                
+                                               
+                                                
+                                               
+                                            </Button>
+
+                                            <div className="divider">
+
+                                                </div>
+                                              
+                                            <Button variant = "contained" 
+                                                style={{ color: "white" , backgroundColor:"#931621"}}
+                                                onClick={() => {
+                                                    props.history.push("/")
+                                                    window.location.reload();
+                                                }}>
+                                                <img src={logout} alt="logout" height="40px" width="40"></img>
                                                 
                                                 
                                                
